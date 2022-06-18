@@ -12,8 +12,8 @@
 
 #define WIN_INIT_X 100
 #define WIN_INIT_Y 50
-#define WIN_WIDTH  600
-#define WIN_HEIGHT 600
+#define WIN_WIDTH  601
+#define WIN_HEIGHT 601
 
 #define TEXT_SIZE 12
 
@@ -21,7 +21,7 @@
 #define BG_COLOR      0,  0,  0,255
 #define SNAKE_COLOR   0,255,  0,255
 #define APPLE_COLOR 255,  0,  0,255
-#define TEXT_COLOR  255,255,255,255
+#define TEXT_COLOR    0,  0,255,255
 
 
 class Game{

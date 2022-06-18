@@ -1,4 +1,4 @@
-#include "game.hpp"
+#include "..\include\game.hpp"
 
 std::mt19937 mt(time(NULL));
 
@@ -111,10 +111,10 @@ void Game::render(){
     int ySize = WIN_HEIGHT/height;
 
     SDL_SetRenderDrawColor(renderer, GRID_COLOR);
-    for(int i = 0; i < WIN_WIDTH; i += xSize){
+    for(int i = 0; i <= WIN_WIDTH; i += xSize){
         SDL_RenderDrawLine(renderer, i, 0, i, WIN_HEIGHT);
     }
-    for(int i = 0; i < WIN_HEIGHT; i += ySize){
+    for(int i = 0; i <= WIN_HEIGHT; i += ySize){
         SDL_RenderDrawLine(renderer, 0, i, WIN_WIDTH, i);
     }
 
@@ -131,7 +131,7 @@ void Game::render(){
     SDL_RenderDrawRect(renderer, &rect);
     SDL_RenderFillRect(renderer, &rect);
 
-    rect = {.x=0, .y=0, .w=10*TEXT_SIZE, .h=TEXT_SIZE};
+    rect = {.x=0, .y=ySize/4, .w=10*TEXT_SIZE, .h=TEXT_SIZE};
     SDL_RenderCopy(renderer, text, NULL, &rect);
 
     SDL_RenderPresent(renderer);

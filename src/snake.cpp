@@ -1,4 +1,4 @@
-#include "snake.hpp"
+#include "..\include\snake.hpp"
 
 
 Snake::Snake(int xBoundary, int yBoundary){
