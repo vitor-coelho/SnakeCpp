@@ -96,6 +96,21 @@ Matrix NeuralNetwork::feedforward(Matrix input, bool addBias){
     return input;
 }
 
+int NeuralNetwork::maxOutput(Matrix output){
+    if(output.numRows() != 1)
+        throw std::invalid_argument("Input must be a row matrix");
+    
+    float max = output(0, (size_t) 0);
+    int maxIdx = 0;
+    for(size_t i = 1; i < output.numCols(); i++){
+        if(output(0,i) > max){
+            max = output(0,i);
+            maxIdx = i;
+        }
+    }
+    return maxIdx;
+}
+
 void NeuralNetwork::saveToFile(std::string path){} // TODO
 
 void NeuralNetwork::assignNN(NeuralNetwork nn){

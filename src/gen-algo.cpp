@@ -1,8 +1,4 @@
-#include "gen-algo.hpp"
-
-#define NUM_LAYERS  3
-#define LAYERS      5,10,4
-#define ACTIVATIONS relu,softmax
+#include "..\include\gen-algo.hpp"
 
 // TODO: permitir criar populações com redes neurais diferentes (número de layers, ativações)
 
@@ -23,6 +19,10 @@ GenAlgo::GenAlgo(std::vector<individual_t> initPopulation){
 }
 
 GenAlgo::~GenAlgo(){}
+
+std::vector<individual_t> GenAlgo::getPopulation(){
+    return population;
+}
 
 void GenAlgo::resetPopulationList(){
     population.clear();

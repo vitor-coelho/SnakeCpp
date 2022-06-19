@@ -31,6 +31,10 @@ std::vector<pos> Snake::getBody(){
     return body;
 }
 
+pos Snake::getHead(){
+    return body.at(0);
+}
+
 void Snake::move(){
     for(auto position = body.rbegin(); position != body.rend()-1; position++){
         *position = *(position+1);

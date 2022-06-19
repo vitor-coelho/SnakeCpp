@@ -6,6 +6,13 @@
 #include "matrix.hpp"
 #include "nn.hpp"
 
+#define NUM_LAYERS  4
+#define LAYERS      9,20,15,4
+#define ACTIVATIONS relu,sigmoid,softmax
+
+#define NUM_GENERATIONS 250
+#define POPULATION_SIZE 500
+
 typedef struct individual_t{
     NeuralNetwork* genome;
     float fitness;
@@ -23,6 +30,8 @@ class GenAlgo{
         GenAlgo(int popSize);
         GenAlgo(std::vector<individual_t> initPopulation);
         ~GenAlgo();
+
+        std::vector<individual_t> getPopulation();
 
         void setFitness(std::vector<float> fitness);
         void resetPopulationList();

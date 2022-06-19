@@ -27,6 +27,7 @@ class Snake{
         bool getAlive();
         int getScore();
         std::vector<pos> getBody();
+        pos getHead();
 
         bool checkPosInBody(int x, int y);
         bool checkWallCollision(int xBoundary, int yBoundary);

@@ -1,5 +1,6 @@
 {
     "files.associations": {
+        "*.cpp": "cpp",
         "array": "cpp",
         "*.tcc": "cpp",
         "cctype": "cpp",
@@ -34,6 +35,8 @@
         "utility": "cpp",
         "deque": "cpp",
         "functional": "cpp",
-        "numeric": "cpp"
+        "numeric": "cpp",
+        "ctime": "cpp",
+        "iomanip": "cpp"
     }
 }

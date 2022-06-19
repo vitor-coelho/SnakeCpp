@@ -1,4 +1,4 @@
-#include "matrix.hpp"
+#include "..\include\matrix.hpp"
 
 std::mt19937 mt(time(NULL));
 std::uniform_real_distribution<float> dist(-1, 1);
@@ -7,7 +7,7 @@ std::uniform_real_distribution<float> dist(-1, 1);
 Matrix::Matrix(){
     this->rows = 1;
     this->cols = 1;
-    this->values.resize(1, 0);    
+    this->values.resize(1, 0);
 }
 
 Matrix::Matrix(size_t numRows, size_t numCols, std::string fill){

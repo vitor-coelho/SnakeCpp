@@ -1,6 +1,6 @@
 #include "..\include\game.hpp"
 
-std::mt19937 mt(time(NULL));
+std::mt19937 gameGen(time(NULL));
 
 Game::Game(int w, int h, bool toShow, bool human){
     width = w;
@@ -14,17 +14,19 @@ Game::Game(int w, int h, bool toShow, bool human){
 
     newApple();
 
-    SDL_Init(SDL_INIT_EVERYTHING);
+    if(toShow){
+        SDL_Init(SDL_INIT_EVERYTHING);
 
-    window = SDL_CreateWindow("Snake", WIN_INIT_X, WIN_INIT_Y, WIN_WIDTH, WIN_HEIGHT, SDL_WINDOW_SHOWN);
-    renderer = SDL_CreateRenderer(window, -1, 0);
+        window = SDL_CreateWindow("Snake", WIN_INIT_X, WIN_INIT_Y, WIN_WIDTH, WIN_HEIGHT, SDL_WINDOW_SHOWN);
+        renderer = SDL_CreateRenderer(window, -1, 0);
 
-    SDL_Surface * image = SDL_LoadBMP("../img/snake-1.bmp");
-    SDL_SetWindowIcon(window, image);
-    SDL_FreeSurface(image);
+        SDL_Surface * image = SDL_LoadBMP("../img/snake-1.bmp");
+        SDL_SetWindowIcon(window, image);
+        SDL_FreeSurface(image);
 
-    TTF_Init();
-    updateScore(snake->getScore());
+        TTF_Init();
+        updateScore(snake->getScore());
+    }
 }
 
 Game::~Game(){}
@@ -38,8 +40,8 @@ void Game::newApple(){
     std::uniform_int_distribution<int> yDist(0, height-1);
 
     while(true){
-        int newX = xDist(mt);
-        int newY = yDist(mt);
+        int newX = xDist(gameGen);
+        int newY = yDist(gameGen);
 
         if(snake->checkPosInBody(newX, newY) == false){
             appleX = newX;
@@ -58,6 +60,98 @@ void Game::changeSnakeDir(int newDir){
         snake->setDir(2);
     else if(newDir == 3 && snake->getDir() != 1)
         snake->setDir(3);
+}
+
+int Game::getSnakeScore(){
+    return snake->getScore();
+}
+
+Matrix Game::getSnakeInputs(){
+    int addX, addY;
+    if(snake->getDir() == 0)
+        addX = 1;
+    else if(snake->getDir() == 2)
+        addX = -1;
+    else if(snake->getDir() == 1)
+        addY = -1;
+    else if(snake->getDir() == 3)
+        addY = 1;
+
+    pos head = snake->getHead();
+    float normHeadX = head.x / width, normHeadY = head.y / height;
+    float normAppleX = appleX / width, normAppleY = appleY / height;
+
+    float distLeft, distHead, distRight;
+
+    if(addX){
+        for(int i = 0; i < width; i++){
+            if(snake->checkPosInBody(head.x + distHead*addX, head.y))
+                break;
+            else if(head.x + distHead*addX >= width || head.x + distHead*addX < 0)
+                break;
+            distHead++;
+        }
+
+        for(int j = 0; j < height; j++){
+            if(snake->checkPosInBody(head.x, head.y + distRight))
+                break;
+            else if(head.y + distRight >= height)
+                break;
+            distRight++;
+        }
+
+        for(int j = 0; j < height; j++){
+            if(snake->checkPosInBody(head.x, head.y - distLeft))
+                break;
+            else if(head.y - distLeft < 0)
+                break;
+            distLeft++;
+        }
+
+        if(addX == -1){
+            int aux = distLeft;
+            distLeft = distRight;
+            distRight = aux;
+        }
+
+        distLeft /= height; distHead /= width; distRight /= height;
+
+    }else{
+        for(int j = 0; j < height; j++){
+            if(snake->checkPosInBody(head.x, head.y + distHead*addY))
+                break;
+            else if(head.y + distHead*addY >= height || head.y + distHead*addY < 0)
+                break;
+            distHead++;
+        }
+
+        for(int i = 0; i < width; i++){
+            if(snake->checkPosInBody(head.x + distRight, head.y))
+                break;
+            else if(head.x + distRight >= width)
+                break;
+            distRight++;
+        }
+
+        for(int i = 0; i < width; i++){
+            if(snake->checkPosInBody(head.x - distLeft, head.y))
+                break;
+            else if(head.x - distLeft < 0)
+                break;
+            distLeft++;
+        }
+
+        if(addY == 1){
+            int aux = distLeft;
+            distLeft = distRight;
+            distRight = aux;
+        }
+
+        distLeft /= width; distHead /= height; distRight /= width;
+    }
+
+    return Matrix({(float)addX, (float)addY, normHeadX, normHeadY, normAppleX, normAppleY, 
+                   distLeft, distHead, distRight}, 1, 9);
 }
 
 void Game::update(){

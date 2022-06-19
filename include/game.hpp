@@ -7,8 +7,8 @@
 #include <SDL2\SDL_ttf.h>
 #include <random>
 #include <time.h>
-//#include <string>
 #include "snake.hpp"
+#include "matrix.hpp"
 
 #define WIN_INIT_X 100
 #define WIN_INIT_Y 50
@@ -50,6 +50,8 @@ class Game{
         void newApple();
 
         void changeSnakeDir(int newDir);
+        int getSnakeScore();
+        Matrix getSnakeInputs();
 
         void pollEvents();
         void update();

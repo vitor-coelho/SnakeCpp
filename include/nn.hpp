@@ -38,6 +38,7 @@ class NeuralNetwork{
         void assignNN(NeuralNetwork nn);
 
         Matrix feedforward(Matrix input, bool addBias=true);
+        int maxOutput(Matrix output);
         void saveToFile(std::string path);
 
         void operator=(NeuralNetwork nn);
