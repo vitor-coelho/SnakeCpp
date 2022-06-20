@@ -6,12 +6,13 @@
 #include "matrix.hpp"
 #include "nn.hpp"
 
-#define NUM_LAYERS  4
-#define LAYERS      9,20,15,4
-#define ACTIVATIONS relu,sigmoid,softmax
+#define NUM_LAYERS  3
+#define LAYERS      15,8,4
+#define ACTIVATIONS relu,softmax
 
-#define NUM_GENERATIONS 250
-#define POPULATION_SIZE 500
+#define NUM_GENERATIONS 200
+#define POPULATION_SIZE 1000
+#define MAX_TIME_WO_APPLE 15*15 + 1
 
 typedef struct individual_t{
     NeuralNetwork* genome;
@@ -41,7 +42,7 @@ class GenAlgo{
         void mutate(individual_t* individual);
         std::vector<individual_t> getBestIndividuals(int numIndividuals);
 
-        void runGeneration(std::vector<float> newFitness);
+        float runGeneration(std::vector<float> newFitness);
 };
 
 #endif

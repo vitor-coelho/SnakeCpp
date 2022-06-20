@@ -100,10 +100,12 @@ void GenAlgo::setFitness(std::vector<float> newFitness){
         individual->fitness = newFitness[idx++];
 }
 
-void GenAlgo::runGeneration(std::vector<float> newFitness){
+float GenAlgo::runGeneration(std::vector<float> newFitness){
     this->setFitness(newFitness);
 
     std::vector<individual_t> newGeneration = this->getBestIndividuals(10*populationSize/100);
+
+    float maxFitness = newGeneration.at(0).fitness;
 
     this->resetPopulationList();
 
@@ -130,4 +132,6 @@ void GenAlgo::runGeneration(std::vector<float> newFitness){
             this->mutate(&*ind);
         }
     }
+
+    return maxFitness;
 }

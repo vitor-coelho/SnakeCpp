@@ -67,91 +67,65 @@ int Game::getSnakeScore(){
 }
 
 Matrix Game::getSnakeInputs(){
-    int addX, addY;
-    if(snake->getDir() == 0)
-        addX = 1;
-    else if(snake->getDir() == 2)
-        addX = -1;
-    else if(snake->getDir() == 1)
-        addY = -1;
-    else if(snake->getDir() == 3)
-        addY = 1;
-
     pos head = snake->getHead();
+
+    float dir0, dir1, dir2, dir3;
+    float snakeFront, snakeLeft, snakeRight;
+    if(snake->getDir() == 0){
+        dir0 = 1;
+        if(snake->checkPosInBody(head.x+1, head.y))
+            snakeFront = 1;
+        else if(snake->checkPosInBody(head.x, head.y+1))
+            snakeRight = 1;
+        else if(snake->checkPosInBody(head.x, head.y-1))
+            snakeLeft = 1;
+
+    }else if(snake->getDir() == 2){
+        dir2 = 1;
+        if(snake->checkPosInBody(head.x-1, head.y))
+            snakeFront = 1;
+        else if(snake->checkPosInBody(head.x, head.y-1))
+            snakeRight = 1;
+        else if(snake->checkPosInBody(head.x, head.y+1))
+            snakeLeft = 1;
+
+    }else if(snake->getDir() == 1){
+        dir1 = 1;
+        if(snake->checkPosInBody(head.x, head.y-1))
+            snakeFront = 1;
+        else if(snake->checkPosInBody(head.x+1, head.y))
+            snakeRight = 1;
+        else if(snake->checkPosInBody(head.x-1, head.y))
+            snakeLeft = 1;
+
+    }else if(snake->getDir() == 3){
+        dir3 = 1;
+        if(snake->checkPosInBody(head.x, head.y+1))
+            snakeFront = 1;
+        else if(snake->checkPosInBody(head.x-1, head.y))
+            snakeRight = 1;
+        else if(snake->checkPosInBody(head.x+1, head.y))
+            snakeLeft = 1;
+    }
+
+    
     float normHeadX = head.x / width, normHeadY = head.y / height;
     float normAppleX = appleX / width, normAppleY = appleY / height;
 
-    float distLeft, distHead, distRight;
+    float appleAbove, appleBelow, appleLeft, appleRight;
 
-    if(addX){
-        for(int i = 0; i < width; i++){
-            if(snake->checkPosInBody(head.x + distHead*addX, head.y))
-                break;
-            else if(head.x + distHead*addX >= width || head.x + distHead*addX < 0)
-                break;
-            distHead++;
-        }
+    if(head.x > appleX)
+        appleLeft = 1;
+    else if(head.x < appleX)
+        appleRight = 1;
 
-        for(int j = 0; j < height; j++){
-            if(snake->checkPosInBody(head.x, head.y + distRight))
-                break;
-            else if(head.y + distRight >= height)
-                break;
-            distRight++;
-        }
+    if(head.y > appleY)
+        appleAbove = 1;
+    else if(head.y < appleY)
+        appleBelow = 1;
 
-        for(int j = 0; j < height; j++){
-            if(snake->checkPosInBody(head.x, head.y - distLeft))
-                break;
-            else if(head.y - distLeft < 0)
-                break;
-            distLeft++;
-        }
-
-        if(addX == -1){
-            int aux = distLeft;
-            distLeft = distRight;
-            distRight = aux;
-        }
-
-        distLeft /= height; distHead /= width; distRight /= height;
-
-    }else{
-        for(int j = 0; j < height; j++){
-            if(snake->checkPosInBody(head.x, head.y + distHead*addY))
-                break;
-            else if(head.y + distHead*addY >= height || head.y + distHead*addY < 0)
-                break;
-            distHead++;
-        }
-
-        for(int i = 0; i < width; i++){
-            if(snake->checkPosInBody(head.x + distRight, head.y))
-                break;
-            else if(head.x + distRight >= width)
-                break;
-            distRight++;
-        }
-
-        for(int i = 0; i < width; i++){
-            if(snake->checkPosInBody(head.x - distLeft, head.y))
-                break;
-            else if(head.x - distLeft < 0)
-                break;
-            distLeft++;
-        }
-
-        if(addY == 1){
-            int aux = distLeft;
-            distLeft = distRight;
-            distRight = aux;
-        }
-
-        distLeft /= width; distHead /= height; distRight /= width;
-    }
-
-    return Matrix({(float)addX, (float)addY, normHeadX, normHeadY, normAppleX, normAppleY, 
-                   distLeft, distHead, distRight}, 1, 9);
+    return Matrix({dir0, dir1, dir2, dir3, normHeadX, normHeadY, normAppleX, normAppleY, 
+                   snakeFront, snakeLeft, snakeRight, appleAbove, appleBelow, appleLeft, appleRight}, 1, 15);
 }
 
 void Game::update(){

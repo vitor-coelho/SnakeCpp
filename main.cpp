@@ -12,7 +12,7 @@
 using namespace std;
 
 void optimizeAI(bool show);
-int  gameAI(individual_t individual, bool show);
+float gameAI(individual_t individual, bool show);
 void gameHuman();
 
 
@@ -30,8 +30,10 @@ void optimizeAI(bool show){
     std::vector<individual_t> population;
     std::vector<float> fitness;
 
+    float maxFitness;
+
     while(generation--){
-        cout << "Generation: " << generation + 1 << endl;
+        cout << "Generation " << generation + 1 << " | ";
 
         population = optimizer.getPopulation();
         fitness.clear();
@@ -40,7 +42,8 @@ void optimizeAI(bool show){
             fitness.push_back(gameAI(*individual, show));
         }
 
-        optimizer.runGeneration(fitness);
+        maxFitness = optimizer.runGeneration(fitness);
+        cout << "Max fitness = " << maxFitness << endl;
     }
 
     for(auto individual = population.begin(); individual != population.end(); ++individual){
@@ -48,8 +51,11 @@ void optimizeAI(bool show){
     }
 }
 
-int gameAI(individual_t individual, bool show){
+float gameAI(individual_t individual, bool show){
     Game game(GAME_WIDTH, GAME_HEIGHT, show, false);
+
+    float timeScore = 0;
+    int snakeScore = game.getSnakeScore(), iterWithoutApple = 0;
 
     while(game.isRunning()){
         Matrix input = game.getSnakeInputs();
@@ -62,6 +68,19 @@ int gameAI(individual_t individual, bool show){
         
         game.update();
 
+        timeScore += 0.1;
+
+        if(snakeScore < game.getSnakeScore()){
+            snakeScore = game.getSnakeScore();
+            iterWithoutApple = 0;
+        }else{
+            iterWithoutApple++;
+        }
+
+        if(iterWithoutApple > MAX_TIME_WO_APPLE){
+            break;
+        }
+
         if(show){
             game.render();
             SDL_Delay(200);
@@ -70,7 +89,7 @@ int gameAI(individual_t individual, bool show){
 
     game.quit();
 
-    return game.getSnakeScore();
+    return 10*game.getSnakeScore() + timeScore;
 }
 
 void gameHuman(){

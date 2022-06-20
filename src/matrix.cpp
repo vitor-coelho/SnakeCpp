@@ -1,7 +1,7 @@
 #include "..\include\matrix.hpp"
 
 std::mt19937 mt(time(NULL));
-std::uniform_real_distribution<float> dist(-1, 1);
+std::normal_distribution<float> dist(0, 1);
 
 
 Matrix::Matrix(){
