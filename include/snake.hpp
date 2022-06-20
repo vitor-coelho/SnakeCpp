@@ -16,6 +16,7 @@ class Snake{
         std::vector<pos> body;
         int direction = 0;  // 0: right, 1: up, 2: left, 3: down
         int size = 3;
+        int steps = 0;
         bool alive = true;
 
     public:
@@ -26,6 +27,7 @@ class Snake{
         void setDir(int newDir);
         bool getAlive();
         int getScore();
+        float getFitness();
         std::vector<pos> getBody();
         pos getHead();
 

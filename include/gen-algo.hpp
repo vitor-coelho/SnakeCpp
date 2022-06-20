@@ -7,10 +7,10 @@
 #include "nn.hpp"
 
 #define NUM_LAYERS  3
-#define LAYERS      15,8,4
+#define LAYERS      15,4,4
 #define ACTIVATIONS relu,softmax
 
-#define NUM_GENERATIONS 200
+#define NUM_GENERATIONS 500
 #define POPULATION_SIZE 1000
 #define MAX_TIME_WO_APPLE 15*15 + 1
 

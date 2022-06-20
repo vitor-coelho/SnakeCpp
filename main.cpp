@@ -2,8 +2,8 @@
 #include "include/game.hpp"
 #include "include/gen-algo.hpp"
 
-#define GAME_WIDTH  15
-#define GAME_HEIGHT 15
+#define GAME_WIDTH  8
+#define GAME_HEIGHT 8
 
 #define FPS 15
 
@@ -19,6 +19,7 @@ void gameHuman();
 int main(int argv, char** args){
     
     optimizeAI(SHOW);
+    //gameHuman();
 
     return 0;    
 }
@@ -46,15 +47,16 @@ void optimizeAI(bool show){
         cout << "Max fitness = " << maxFitness << endl;
     }
 
+    population = optimizer.getBestIndividuals(10);
+
     for(auto individual = population.begin(); individual != population.end(); ++individual){
-        fitness.push_back(gameAI(*individual, true));
+        gameAI(*individual, true);
     }
 }
 
 float gameAI(individual_t individual, bool show){
     Game game(GAME_WIDTH, GAME_HEIGHT, show, false);
 
-    float timeScore = 0;
     int snakeScore = game.getSnakeScore(), iterWithoutApple = 0;
 
     while(game.isRunning()){
@@ -67,8 +69,6 @@ float gameAI(individual_t individual, bool show){
         game.changeSnakeDir(newDir);
         
         game.update();
-
-        timeScore += 0.1;
 
         if(snakeScore < game.getSnakeScore()){
             snakeScore = game.getSnakeScore();
@@ -89,7 +89,7 @@ float gameAI(individual_t individual, bool show){
 
     game.quit();
 
-    return 10*game.getSnakeScore() + timeScore;
+    return game.getSnakeFitness();
 }
 
 void gameHuman(){

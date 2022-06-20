@@ -87,7 +87,7 @@ void GenAlgo::mutate(individual_t* individual){
 }
 
 std::vector<individual_t> GenAlgo::getBestIndividuals(int numIndividuals){
-    std::sort(population.begin(), population.end(),[](auto ind1, auto ind2){return ind1.fitness < ind2.fitness;});
+    std::sort(population.begin(), population.end(),[](auto ind1, auto ind2){return ind1.fitness > ind2.fitness;});
 
     std::vector<individual_t> selected(numIndividuals);
     std::copy(population.begin(), population.begin()+numIndividuals, selected.begin());
@@ -109,6 +109,8 @@ float GenAlgo::runGeneration(std::vector<float> newFitness){
 
     this->resetPopulationList();
 
+    this->appendIndividuals(newGeneration);
+
     // Add offspring resulting from crossover of the most fit
     for(size_t i = 0; i < newGeneration.size(); i++){
         for(size_t j = 0; j < newGeneration.size(); j++){
@@ -118,10 +120,10 @@ float GenAlgo::runGeneration(std::vector<float> newFitness){
             std::vector<individual_t> offspring = this->crossover(newGeneration[i], newGeneration[j], 0.2);
             this->appendIndividuals(offspring);
 
-            if(population.size() >= 0.5*populationSize)
-                break; // Half of the pop. size is the maximum
+            if(population.size() >= 0.8*populationSize)
+                break; // 80% of the pop. size is the maximum
         }
-        if(population.size() >= 0.5*populationSize)
+        if(population.size() >= 0.8*populationSize)
                 break;
     }
 

@@ -51,6 +51,7 @@ class Game{
 
         void changeSnakeDir(int newDir);
         int getSnakeScore();
+        float getSnakeFitness();
         Matrix getSnakeInputs();
 
         void pollEvents();

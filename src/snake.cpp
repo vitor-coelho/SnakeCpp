@@ -24,7 +24,13 @@ bool Snake::getAlive(){
 }
 
 int Snake::getScore(){
-    return size-3;
+    return size - 3;
+}
+
+float Snake::getFitness(){
+    if(size - 3 > 2)
+        return 10*(size-3) + steps;
+    else return steps;
 }
 
 std::vector<pos> Snake::getBody(){
@@ -48,6 +54,8 @@ void Snake::move(){
         body.front().y -= 1;
     else if(direction == 3)
         body.front().y += 1;
+
+    steps += 1;
 }
 
 void Snake::grow(){

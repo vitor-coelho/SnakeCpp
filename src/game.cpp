@@ -66,6 +66,10 @@ int Game::getSnakeScore(){
     return snake->getScore();
 }
 
+float Game::getSnakeFitness(){
+    return snake->getFitness();
+}
+
 Matrix Game::getSnakeInputs(){
     pos head = snake->getHead();
 
