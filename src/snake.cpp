@@ -28,9 +28,7 @@ int Snake::getScore(){
 }
 
 float Snake::getFitness(){
-    if(size - 3 > 2)
-        return 10*(size-3) + steps;
-    else return steps;
+    return size > 4 ? 10*(size-3) + steps*0.1 : steps*0.001;
 }
 
 std::vector<pos> Snake::getBody(){

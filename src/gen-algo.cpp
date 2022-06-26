@@ -3,13 +3,14 @@
 // TODO: permitir criar populações com redes neurais diferentes (número de layers, ativações)
 
 std::mt19937 generator(time(NULL));
-std::uniform_real_distribution<float> distribution(0, 1);
+std::normal_distribution<float> distribution(0, 1);
+std::uniform_real_distribution<float> chance_dist(0, 1);
 
 GenAlgo::GenAlgo(int popSize){
     populationSize = popSize;
 
     for(int i = 0; i < populationSize; i++){
-        population.push_back({new NeuralNetwork(NUM_LAYERS, {LAYERS}, {ACTIVATIONS}, true), 0});
+        population.push_back({new NeuralNetwork(NUM_LAYERS, {new FCLayer(LAYER1), new FCLayer(LAYER2)}), 0});
     }
 }
 
@@ -30,7 +31,7 @@ void GenAlgo::resetPopulationList(){
 
 void GenAlgo::appendRandomIndividuals(int numNewIndividuals){
     for(int i = 0; i < numNewIndividuals; i++){
-        individual_t newIndividual = {new NeuralNetwork(NUM_LAYERS, {LAYERS}, {ACTIVATIONS}), 0};
+        individual_t newIndividual = {new NeuralNetwork(NUM_LAYERS, {new FCLayer(LAYER1), new FCLayer(LAYER2)}), 0};
         population.push_back(newIndividual);
     }
 }
@@ -45,26 +46,30 @@ std::vector<individual_t> GenAlgo::crossover(individual_t individual1, individua
 
     individual_t offspring1, offspring2;
 
-    offspring1.genome = new NeuralNetwork(NUM_LAYERS, {LAYERS}, {ACTIVATIONS}, true);
-    offspring2.genome = new NeuralNetwork(NUM_LAYERS, {LAYERS}, {ACTIVATIONS}, true);
+    offspring1.genome = new NeuralNetwork(NUM_LAYERS, {new FCLayer(LAYER1), new FCLayer(LAYER2)});
+    offspring2.genome = new NeuralNetwork(NUM_LAYERS, {new FCLayer(LAYER1), new FCLayer(LAYER2)});
 
     *(offspring1.genome) = *(individual1.genome);
     *(offspring2.genome) = *(individual2.genome);
 
-    for(int nnIdx = 0; nnIdx < individual1.genome->getNumLayers()-1; nnIdx++){
-        for(size_t col = 0; col < individual1.genome->getWeights().at(nnIdx)->numCols(); col++){
-            
-            if(true){ // distribution(generator) < chance
-                // Crossover
-                offspring1.genome->getWeights().at(nnIdx)->del(col, col, false);
-                offspring2.genome->getWeights().at(nnIdx)->del(col, col, false);
+    auto layers1 = offspring1.genome->getLayers();
+    auto layers2 = offspring2.genome->getLayers();
+    
+    for(auto layerIdx = 0; layerIdx < NUM_LAYERS - 1; layerIdx++){
+        for(size_t colIdx = 0; colIdx < layers1.at(layerIdx)->getOutputSize(); colIdx++){
+            if(chance_dist(generator) < chance){
+                auto col1 = layers1.at(layerIdx)->getWeights()(colIdx, COLUMN);
+                auto col2 = layers2.at(layerIdx)->getWeights()(colIdx, COLUMN);
 
-                offspring1.genome->getWeights().at(nnIdx)->insert((*individual2.genome->getWeights().at(nnIdx))(col,false), col, false);
-                offspring2.genome->getWeights().at(nnIdx)->insert((*individual1.genome->getWeights().at(nnIdx))(col,false), col, false);
+                layers1.at(layerIdx)->setWeights(layers1.at(layerIdx)->getWeights().del(colIdx, colIdx, COLUMN));
+                layers2.at(layerIdx)->setWeights(layers2.at(layerIdx)->getWeights().del(colIdx, colIdx, COLUMN));
+
+                layers1.at(layerIdx)->setWeights(layers1.at(layerIdx)->getWeights().insert(col2, colIdx, COLUMN));
+                layers2.at(layerIdx)->setWeights(layers2.at(layerIdx)->getWeights().insert(col1, colIdx, COLUMN));
             }
-
         }
     }
+
     return std::vector<individual_t> {offspring1, offspring2};
 }
 
@@ -74,11 +79,11 @@ void GenAlgo::mutate(individual_t* individual){
     size_t numRows, numCols;
 
     for(int i = 0; i < numLayers; i++){
-        numRows = individual->genome->getWeights().at(i)->numRows();
-        numCols = individual->genome->getWeights().at(i)->numCols();
-        Matrix rndMatrix(numRows, numCols, "random");
+        numRows = individual->genome->getLayers().at(i)->getInputSize();
+        numCols = individual->genome->getLayers().at(i)->getOutputSize();
+        Matrix<float> rndMatrix(numRows+1, numCols, distribution);
 
-        individual->genome->getWeights().at(i)->add(rndMatrix);
+        individual->genome->getLayers().at(i)->getWeights() += rndMatrix; // test
     }
 
     // Pode ser de multiplicação (TODO)
@@ -117,7 +122,7 @@ float GenAlgo::runGeneration(std::vector<float> newFitness){
             if(i >= j)
                 continue;
 
-            std::vector<individual_t> offspring = this->crossover(newGeneration[i], newGeneration[j], 0.2);
+            std::vector<individual_t> offspring = this->crossover(newGeneration[i], newGeneration[j], CROSSOVER_CHANCE);
             this->appendIndividuals(offspring);
 
             if(population.size() >= 0.8*populationSize)
@@ -130,7 +135,7 @@ float GenAlgo::runGeneration(std::vector<float> newFitness){
     this->appendRandomIndividuals(populationSize - population.size());
     
     for(auto ind = population.begin(); ind != population.end(); ++ind){
-        if(true){ //distribution(generator) < 0.2
+        if(chance_dist(generator) < MUTATE_CHANCE){
             this->mutate(&*ind);
         }
     }

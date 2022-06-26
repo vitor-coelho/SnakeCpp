@@ -3,16 +3,20 @@
 
 #include <vector>
 #include <algorithm>
-#include "matrix.hpp"
-#include "nn.hpp"
+#include "..\neuralnetwork\matrix.hpp"
+#include "..\neuralnetwork\nn.hpp"
 
 #define NUM_LAYERS  3
-#define LAYERS      15,4,4
-#define ACTIVATIONS relu,softmax
+#define LAYER1      (size_t) 8, (size_t)  16, sigmoid
+#define LAYER2      (size_t) 16, (size_t)  4, softmax
 
-#define NUM_GENERATIONS 500
-#define POPULATION_SIZE 1000
+#define NUM_GENERATIONS 1000
+#define POPULATION_SIZE 200
 #define MAX_TIME_WO_APPLE 15*15 + 1
+
+#define MUTATE_CHANCE 0.2
+#define CROSSOVER_CHANCE 0.1
+
 
 typedef struct individual_t{
     NeuralNetwork* genome;

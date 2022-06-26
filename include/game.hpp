@@ -8,7 +8,7 @@
 #include <random>
 #include <time.h>
 #include "snake.hpp"
-#include "matrix.hpp"
+#include "..\neuralnetwork\matrix.hpp"
 
 #define WIN_INIT_X 100
 #define WIN_INIT_Y 50
@@ -52,7 +52,7 @@ class Game{
         void changeSnakeDir(int newDir);
         int getSnakeScore();
         float getSnakeFitness();
-        Matrix getSnakeInputs();
+        Matrix<float> getSnakeInputs();
 
         void pollEvents();
         void update();

@@ -2,8 +2,8 @@
 #include "include/game.hpp"
 #include "include/gen-algo.hpp"
 
-#define GAME_WIDTH  8
-#define GAME_HEIGHT 8
+#define GAME_WIDTH  12
+#define GAME_HEIGHT 12
 
 #define FPS 15
 
@@ -21,7 +21,7 @@ int main(int argv, char** args){
     optimizeAI(SHOW);
     //gameHuman();
 
-    return 0;    
+    return 0;
 }
 
 void optimizeAI(bool show){
@@ -60,11 +60,11 @@ float gameAI(individual_t individual, bool show){
     int snakeScore = game.getSnakeScore(), iterWithoutApple = 0;
 
     while(game.isRunning()){
-        Matrix input = game.getSnakeInputs();
+        Matrix<float> input = game.getSnakeInputs();
 
-        Matrix output = individual.genome->feedforward(input);
+        Matrix<float> output = individual.genome->feedforward(input);
 
-        int newDir = individual.genome->maxOutput(output);
+        int newDir = output.maxIdx();
 
         game.changeSnakeDir(newDir);
         
@@ -83,13 +83,17 @@ float gameAI(individual_t individual, bool show){
 
         if(show){
             game.render();
-            SDL_Delay(200);
+            SDL_Delay(50);
         }
     }
 
+    float fitness = game.getSnakeFitness();
+
+    //cout << "Fitness: " << fitness << endl;
+
     game.quit();
 
-    return game.getSnakeFitness();
+    return fitness;
 }
 
 void gameHuman(){
@@ -111,7 +115,3 @@ void gameHuman(){
     SDL_Delay(3000);
     game.quit();
 }
-
-
-
-

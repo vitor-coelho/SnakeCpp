@@ -70,66 +70,66 @@ float Game::getSnakeFitness(){
     return snake->getFitness();
 }
 
-Matrix Game::getSnakeInputs(){
+Matrix<float> Game::getSnakeInputs(){
     pos head = snake->getHead();
 
-    float dir0, dir1, dir2, dir3;
-    float snakeFront, snakeLeft, snakeRight;
+    // dir0,dir1,dir2,dir3, left,front,right, headX,headY, appleX,appleY, appleAbove,appleBelow,appleLeft,appleRight
+    //    0,   1,   2,   3,    4,    5,    6,     7,    8,      9,    10,         11,        12,       13,        14
+    Matrix<float> input(1, 8);  
+
     if(snake->getDir() == 0){
-        dir0 = 1;
-        if(snake->checkPosInBody(head.x+1, head.y))
-            snakeFront = 1;
-        else if(snake->checkPosInBody(head.x, head.y+1))
-            snakeRight = 1;
-        else if(snake->checkPosInBody(head.x, head.y-1))
-            snakeLeft = 1;
+        input.set(1, 0, 0);
+        // if(snake->checkPosInBody(head.x+1, head.y))
+        //     input.set(1, 0, 5);
+        // else if(snake->checkPosInBody(head.x, head.y+1))
+        //     input.set(1, 0, 6);
+        // else if(snake->checkPosInBody(head.x, head.y-1))
+        //     input.set(1, 0, 4);
 
     }else if(snake->getDir() == 2){
-        dir2 = 1;
-        if(snake->checkPosInBody(head.x-1, head.y))
-            snakeFront = 1;
-        else if(snake->checkPosInBody(head.x, head.y-1))
-            snakeRight = 1;
-        else if(snake->checkPosInBody(head.x, head.y+1))
-            snakeLeft = 1;
+        input.set(1, 0, 2);
+        // if(snake->checkPosInBody(head.x-1, head.y))
+        //     input.set(1, 0, 5);
+        // else if(snake->checkPosInBody(head.x, head.y-1))
+        //     input.set(1, 0, 6);
+        // else if(snake->checkPosInBody(head.x, head.y+1))
+        //     input.set(1, 0, 4);
 
     }else if(snake->getDir() == 1){
-        dir1 = 1;
-        if(snake->checkPosInBody(head.x, head.y-1))
-            snakeFront = 1;
-        else if(snake->checkPosInBody(head.x+1, head.y))
-            snakeRight = 1;
-        else if(snake->checkPosInBody(head.x-1, head.y))
-            snakeLeft = 1;
+        input.set(1, 0, 1);
+        // if(snake->checkPosInBody(head.x, head.y-1))
+        //     input.set(1, 0, 5);
+        // else if(snake->checkPosInBody(head.x+1, head.y))
+        //     input.set(1, 0, 6);
+        // else if(snake->checkPosInBody(head.x-1, head.y))
+        //     input.set(1, 0, 4);
 
     }else if(snake->getDir() == 3){
-        dir3 = 1;
-        if(snake->checkPosInBody(head.x, head.y+1))
-            snakeFront = 1;
-        else if(snake->checkPosInBody(head.x-1, head.y))
-            snakeRight = 1;
-        else if(snake->checkPosInBody(head.x+1, head.y))
-            snakeLeft = 1;
+        input.set(1, 0, 3);
+        // if(snake->checkPosInBody(head.x, head.y+1))
+        //     input.set(1, 0, 5);
+        // else if(snake->checkPosInBody(head.x-1, head.y))
+        //     input.set(1, 0, 6);
+        // else if(snake->checkPosInBody(head.x+1, head.y))
+        //     input.set(1, 0, 4);
     }
 
-    
-    float normHeadX = head.x / width, normHeadY = head.y / height;
-    float normAppleX = appleX / width, normAppleY = appleY / height;
+    input.set((float) head.x /  (width-1), 0, 4);
+    input.set((float) head.y / (height-1), 0, 5);
+    input.set((float) appleX /  (width-1), 0, 6);
+    input.set((float) appleY / (height-1), 0, 7);
 
-    float appleAbove, appleBelow, appleLeft, appleRight;
+    // if(head.x > appleX)
+    //     input.set(1, 0, 13);
+    // else if(head.x < appleX)
+    //     input.set(1, 0, 14);
 
-    if(head.x > appleX)
-        appleLeft = 1;
-    else if(head.x < appleX)
-        appleRight = 1;
+    // if(head.y > appleY)
+    //     input.set(1, 0, 11);
+    // else if(head.y < appleY)
+    //     input.set(1, 0, 12);
 
-    if(head.y > appleY)
-        appleAbove = 1;
-    else if(head.y < appleY)
-        appleBelow = 1;
-
-    return Matrix({dir0, dir1, dir2, dir3, normHeadX, normHeadY, normAppleX, normAppleY, 
-                   snakeFront, snakeLeft, snakeRight, appleAbove, appleBelow, appleLeft, appleRight}, 1, 15);
+    return input;
 }
 
 void Game::update(){

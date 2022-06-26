@@ -393,5 +393,6 @@ FodyWeavers.xsd
 # JetBrains Rider
 *.sln.iml
 
-build/*.o
-build/*.exe
+build
+
+.gitignore
