@@ -53,6 +53,7 @@ class Game{
         int getSnakeScore();
         float getSnakeFitness();
         Matrix<float> getSnakeInputs();
+        int getSnakePerfectMove();
 
         void pollEvents();
         void update();

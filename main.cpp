@@ -1,25 +1,28 @@
 #include <SDL2/SDL.h>
 #include "include/game.hpp"
 #include "include/gen-algo.hpp"
+#include "neuralnetwork\dataset.hpp"
 
 #define GAME_WIDTH  12
 #define GAME_HEIGHT 12
 
 #define FPS 15
 
-#define SHOW false
+#define SHOW true
 
 using namespace std;
 
 void optimizeAI(bool show);
 float gameAI(individual_t individual, bool show);
 void gameHuman();
+void perfectGame();
 
 
 int main(int argv, char** args){
     
-    optimizeAI(SHOW);
+    //optimizeAI(SHOW);
     //gameHuman();
+    perfectGame();
 
     return 0;
 }
@@ -114,4 +117,34 @@ void gameHuman(){
 
     SDL_Delay(3000);
     game.quit();
+}
+
+void perfectGame(){
+    Game game(GAME_WIDTH, GAME_HEIGHT, SHOW, false);
+    Matrix<float> inputData, outputData;
+
+    while(game.isRunning()){
+        Matrix<float> input = game.getSnakeInputs();
+
+        int newDir = game.getSnakePerfectMove();
+        game.changeSnakeDir(newDir);
+
+        Matrix<float> move(1,4);
+        move.set(1, 0, newDir);
+
+        inputData = inputData.append(input, ROW);
+        outputData = outputData.append(move, ROW);
+
+        game.update();
+
+        if(SHOW){
+            game.render();
+            SDL_Delay(1);
+        }
+    }
+
+    game.quit();
+
+    writeMatrixToCsv(inputData, "input.csv");
+    writeMatrixToCsv(outputData, "output.csv");
 }

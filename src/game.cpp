@@ -132,8 +132,38 @@ Matrix<float> Game::getSnakeInputs(){
     return input;
 }
 
+int Game::getSnakePerfectMove(){
+    int posX = snake->getHead().x, posY = snake->getHead().y;
+    int dir = snake->getDir(), nextDir = dir;
+
+    if(dir == 0){
+        if(posX == width-1)
+            nextDir = 3;
+    }else if(dir == 1){
+        if(posY == 0)
+            nextDir = 0;
+    }else if(dir == 2){
+        if(posX == 1 && posY != height-1)
+            nextDir = 3;
+        else if(posX == 0)
+            nextDir = 1;
+    }else{
+        if(posX == width-1)
+            nextDir = 2;
+        else if(posX == 1)
+            nextDir = 0;
+    }
+
+    return nextDir;
+}
+
 void Game::update(){
     if(started){
+        if(snake->getScore() == width*height - 4){
+            running = false;
+            return;
+        }
+
         if(snake->updateSnake(width, height, appleX, appleY)){
             newApple();
             updateScore(snake->getScore());

@@ -7,8 +7,8 @@
 #include "..\neuralnetwork\nn.hpp"
 
 #define NUM_LAYERS  3
-#define LAYER1      (size_t) 8, (size_t)  16, sigmoid
-#define LAYER2      (size_t) 16, (size_t)  4, softmax
+#define LAYER1      (size_t) 8, (size_t)  16, sigmoid, sigmoidDerivative
+#define LAYER2      (size_t) 16, (size_t)  4, softmax, softmaxDerivative
 
 #define NUM_GENERATIONS 1000
 #define POPULATION_SIZE 200

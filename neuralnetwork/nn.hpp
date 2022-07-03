@@ -8,6 +8,7 @@
 #include "matrix.hpp"
 #include "activations.hpp"
 #include "layers.hpp"
+#include "costs.hpp"
 
 // Entrada: vetor linha (Matrix(1,n))
 
@@ -33,6 +34,7 @@ class NeuralNetwork{
         void operator=(NeuralNetwork nn);
 
         Matrix<float> feedforward(Matrix<float> input);
+        float trainBatch(Matrix<float> input, Matrix<float> target, float learningRate, cost_t costFunc, cost_deriv_t costDer);
         void saveToFile(std::string path);
 };
 
