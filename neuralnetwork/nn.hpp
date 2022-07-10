@@ -9,6 +9,7 @@
 #include "activations.hpp"
 #include "layers.hpp"
 #include "costs.hpp"
+#include "dataset.hpp"
 
 // Entrada: vetor linha (Matrix(1,n))
 
@@ -20,6 +21,7 @@ class NeuralNetwork{
         std::vector<Layer*> layers;
 
     public:
+        NeuralNetwork(size_t numberOfLayers);
         NeuralNetwork(size_t numberOfLayers, std::vector<Layer*> NNLayers);
         ~NeuralNetwork();
 
@@ -34,8 +36,10 @@ class NeuralNetwork{
         void operator=(NeuralNetwork nn);
 
         Matrix<float> feedforward(Matrix<float> input);
+        void train(Dataset dataset, int epochs, float learningRate, cost_t costFunc, cost_deriv_t costDer);
         float trainBatch(Matrix<float> input, Matrix<float> target, float learningRate, cost_t costFunc, cost_deriv_t costDer);
         void saveToFile(std::string path);
+        static NeuralNetwork fromFile(std::string path);
 };
 
 #endif

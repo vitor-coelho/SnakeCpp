@@ -18,10 +18,11 @@ class Layer{
         virtual size_t getInputSize() = 0;
         virtual size_t getOutputSize() = 0;
         virtual Matrix<float> getWeights() = 0;
-        activation_t getActivation();
+        virtual activation_t getActivation() = 0;
 
         virtual void setWeights(Matrix<float> newWeights) = 0;
         virtual void setActivation(activation_t act) = 0;
+        virtual void setActDer(act_deriv_t derv) = 0;
 };
 
 
@@ -50,6 +51,7 @@ class FCLayer : public Layer{
 
         void setWeights(Matrix<float> newWeights);
         void setActivation(activation_t act);
+        void setActDer(act_deriv_t derv);
 };
 
 

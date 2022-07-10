@@ -110,7 +110,7 @@ template <typename T> class Matrix{
 
 
 /* Random number generator utility */
-inline std::mt19937& mt(){static std::mt19937 mt_gen(time(NULL)); return mt_gen;};
+inline std::mt19937& mt(){static std::mt19937 mt_gen(time(NULL)); return mt_gen;}
 
 
 /* Constructors and destructor */

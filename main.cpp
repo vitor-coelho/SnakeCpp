@@ -2,6 +2,7 @@
 #include "include/game.hpp"
 #include "include/gen-algo.hpp"
 #include "neuralnetwork\dataset.hpp"
+#include "neuralnetwork\nn.hpp"
 
 #define GAME_WIDTH  12
 #define GAME_HEIGHT 12
@@ -19,10 +20,14 @@ void perfectGame();
 
 
 int main(int argv, char** args){
+
+    NeuralNetwork perfectNN = NeuralNetwork::fromFile("../perfect_snake/");
+    individual_t perfectSnake = {.genome = &perfectNN, .fitness = 0};
     
     //optimizeAI(SHOW);
     //gameHuman();
-    perfectGame();
+    //perfectGame();
+    gameAI(perfectSnake, true);
 
     return 0;
 }

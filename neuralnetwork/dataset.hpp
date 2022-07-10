@@ -4,10 +4,12 @@
 #include <string>
 #include <fstream>
 #include <sstream>
+#include <cmath>
 #include "matrix.hpp"
 
 #define DELIMITER ','
 
+void shuffleMatrix(Matrix<float>* input, Matrix<float>* output);
 
 class Dataset{
     private:
@@ -22,7 +24,7 @@ class Dataset{
 
     public:
         Dataset(size_t batchSize_);
-        Dataset(Matrix<float> input, Matrix<float> output, float trainPct, float testPct, float validationPct);
+        Dataset(Matrix<float> input, Matrix<float> output, size_t batchSize_, float trainPct, float testPct, float validationPct);
 
         bool nextBatch();       // Update data index to the next batch - returns true if all data has been done
         void shuffle();         // Shuffle train set
@@ -58,17 +60,34 @@ inline Dataset::Dataset(size_t batchSize_){
     dataIdx = 0;
 }
 
-inline Dataset::Dataset(Matrix<float> input, Matrix<float> output, float trainPct, float testPct, float validationPct){
-    size_t trainIdx      = (size_t) trainPct*input.numRows();
-    size_t testIdx       = (size_t) testPct*input.numRows() + trainIdx;
-    size_t validationIdx = (size_t) validationPct*input.numRows() + testIdx;
+inline Dataset::Dataset(Matrix<float> input, Matrix<float> output, size_t batchSize_, float trainPct, float testPct, float validationPct){
+    if(abs(trainPct + testPct + validationPct - 1) > 0.001)
+            throw std::invalid_argument("Percentages must sum to 1");
+
+    float trainIndex = input.numRows()*trainPct;
+    float testIndex  = input.numRows()*testPct + trainIndex;
+    float validationIndex = input.numRows()*validationPct + testIndex;
+
+    size_t trainIdx      = (size_t) trainIndex == std::floor(trainIndex) ? trainIndex - 1 : trainIndex;
+    size_t testIdx       = (size_t) testIndex == std::floor(testIndex) ? testIndex - 1 : testIndex;
+    size_t validationIdx = (size_t) validationIndex == std::floor(validationIndex) ? validationIndex - 1 : validationIndex;
+
+    batchSize = batchSize_;
+    dataIdx = 0;
+    shuffleMatrix(&input, &output);
 
     trainInput  =  input(0, trainIdx, 0, input.numCols()-1);
-    trainOutput = output(0, trainIdx, 0, input.numCols()-1);
-    testInput   =  input(trainIdx, testIdx, 0, input.numCols()-1);
-    testOutput  = output(trainIdx, testIdx, 0, input.numCols()-1);
-    validationInput  =  input(testIdx, validationIdx, 0, input.numCols()-1);
-    validationOutput = output(testIdx, validationIdx, 0, input.numCols()-1);
+    trainOutput = output(0, trainIdx, 0, output.numCols()-1);
+
+    if(testIdx != trainIdx){
+        testInput   =  input(trainIdx+1, testIdx, 0, input.numCols()-1);
+        testOutput  = output(trainIdx+1, testIdx, 0, output.numCols()-1);
+    }
+
+    if(validationIdx != testIdx){
+        validationInput  =  input(testIdx+1, validationIdx, 0, input.numCols()-1);
+        validationOutput = output(testIdx+1, validationIdx, 0, output.numCols()-1);
+    }
 }
 
 inline bool Dataset::nextBatch(){
@@ -94,13 +113,29 @@ inline void Dataset::shuffle(){
     }
 }
 
+inline void shuffleMatrix(Matrix<float>* input, Matrix<float>* output){
+    size_t size = input->numRows();
+    std::vector<size_t> idxList(size);
+    Matrix<float> oldInput = *input, oldOutput = *output;
+
+    std::generate(idxList.begin(), idxList.end(), [n=0]()mutable{return n++;});
+    std::shuffle(idxList.begin(), idxList.end(), mt());
+
+    for(size_t i = 0; i < size; i++){
+        input->set(oldInput(idxList.at(i), ROW), i, ROW);
+        output->set(oldOutput(idxList.at(i), ROW), i, ROW);
+    }
+}
+
 inline static void writeMatrixToCsv(Matrix<float> matrix, std::string path){
     std::fstream fout;
 
     fout.open(path, std::ios::out | std::ios::trunc);
     for(size_t i = 0; i < matrix.numRows(); i++){
         for(size_t j = 0; j < matrix.numCols(); j++){
-            fout << matrix(i,j);
+            fout << std::setprecision(15);
+            fout << std::fixed;
+            fout << std::setw(20) << matrix(i,j);
             if(j != matrix.numCols()-1)
                 fout << DELIMITER;
         }
@@ -166,22 +201,24 @@ inline void Dataset::print(){
     totalSize = trainSize + testSize + valSize;
 
     std::cout << std::endl << "Number of samples: " << totalSize << std::endl;
-    std::cout << "Train samples: " << trainSize << " (" << trainSize/totalSize*100 << "%)" << std::endl;
-    std::cout << "Test samples: " << testSize << " (" << testSize/totalSize*100 << "%)" << std::endl;
-    std::cout << "Validation samples: " << valSize << " (" << valSize/totalSize*100 << "%)" << std::endl;
+    std::cout << std::setprecision(2);
+    std::cout << std::fixed;
+    std::cout << "Train samples: " << trainSize << " (" << std::setw(5) << trainSize*100.0/totalSize << "%)" << std::endl;
+    std::cout << "Test samples: " << testSize << " (" << std::setw(5) << testSize*100.0/totalSize << "%)" << std::endl;
+    std::cout << "Validation samples: " << valSize << " (" << std::setw(5) << valSize*100.0/totalSize << "%)" << std::endl;
 
-    size_t printIdx = trainSize > 5 ? 5 : trainSize-1;
+    size_t printIdx = trainSize > 4 ? 4 : trainSize-1;
     trainInput(0, printIdx, 0, trainInput.numCols()-1).print();
     trainOutput(0, printIdx, 0, trainOutput.numCols()-1).print();
 }
 
 inline Matrix<float> Dataset::getBatchInput(){
-    size_t dataEnd = dataIdx + batchSize < trainInput.numRows() ? dataIdx + batchSize : trainInput.numRows() - 1;
+    size_t dataEnd = dataIdx + batchSize - 1 < trainInput.numRows() ? dataIdx + batchSize - 1 : trainInput.numRows() - 1;
     return trainInput(dataIdx, dataEnd, 0, trainInput.numCols()-1);
 }
 
 inline Matrix<float> Dataset::getBatchOutput(){
-    size_t dataEnd = dataIdx + batchSize < trainOutput.numRows() ? dataIdx + batchSize : trainOutput.numRows() - 1;
+    size_t dataEnd = dataIdx + batchSize - 1 < trainOutput.numRows() ? dataIdx + batchSize - 1 : trainOutput.numRows() - 1;
     return trainOutput(dataIdx, dataEnd, 0, trainOutput.numCols()-1);
 }
 
@@ -215,7 +252,7 @@ inline void Dataset::setValidationOutput(Matrix<float> data){
     validationOutput = data;
 }
 
-void Dataset::operator=(Dataset toCopy){
+inline void Dataset::operator=(Dataset toCopy){
     this->trainInput = toCopy.trainInput;
     this->trainOutput = toCopy.trainOutput;
     this->testInput = toCopy.testInput;

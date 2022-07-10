@@ -33,7 +33,7 @@ Matrix<float> FCLayer::train(Matrix<float> input){
 
 Matrix<float> FCLayer::backpropagate(Matrix<float> error, float learningRate){
     error = actDerivative(lastPreAct, error);
-    Matrix<float> gradient = lastInput.transpose() * error;
+    Matrix<float> gradient = lastInput.transpose() * error / lastInput.numRows();
     weights -= gradient*learningRate;
     error = error * weights(1, weights.numRows()-1, 0, weights.numCols()-1).transpose();
     return error;
@@ -54,3 +54,5 @@ activation_t FCLayer::getActivation(){return activation;}
 void FCLayer::setWeights(Matrix<float> newWeights){weights = newWeights;}
 
 void FCLayer::setActivation(activation_t act){activation = act;}
+
+void FCLayer::setActDer(act_deriv_t derv){actDerivative = derv;}
